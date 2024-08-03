@@ -1,0 +1,288 @@
+1. Description:
+I used a doubly linked list, with a Node struct declared as a private member. The Node struct contains three objects: ItemType m_value: the value stored in the current Node; Node* nextNode: a pointer to the next Node in the list; Node* prevNode: a pointer to the previous node. This list is not circular and does not have a dummy node, but it has both a head Node pointer and a tail Node pointer. The Node’s are in a particular way that when the m_value’s stored in these Node’s are in an order of strictly increasing monotone.
+
+
+2. Pseudocodes:
+
+Set::Set() // Constructor:
+:Initialization list here, let head and tail to be nullptr and size of this Set to be 0.
+{
+}
+
+Set::~Set() // Destructor:
+{
+	If the linked list is empty:
+		Do nothing and return
+	Else:
+		Let p be the head Node pointer
+		Repeatedly till we arrive the tail pointer:
+			delete p,
+			set p to be p’s nextNode
+}
+
+Set::Set(const Set& other) // Copy Constructor
+{
+	Let this->m_value to be the same as the source Set's
+	If the source Set is empty:
+		Let this-->head and this->tail be nullptr
+	Else:
+		Create a new node for this->head, with prevNode and nextNode be nullptr and m_value the same as the source list's head's m_value
+		Get the source's head and store it in an object n,
+		Repeatedly until n is the source's tail:
+			Create a new node for this,
+			Set this new node's m_value the same as n->nextNodes's,
+			Set this new node's nextNode be nullptr,
+			Link this new node with the last node we created,
+			Link the last node we created with this node,
+			Increment n to be n->nextNode.
+		The last node we created is this->tail, simply let this-> tail be it.
+}
+
+&Set Set:: operator= (const Set& other) // Assignment Operator Overload
+{
+	If source Set is just this,
+		return *this.
+	Else
+		Declare (not using new) a temporary Set n and initialize it with the copy constructor above.
+		Swap n and this.
+		return *this.
+}
+ 
+
+bool Set::empty() const // Check if the Set is empty
+{
+	check if this->head is nullptr, if true return true and if false return false.
+}
+
+
+int Set::size() const // Get m_size
+{
+    Simply return m_size.
+}
+
+bool Set::insert(const ItemType& value) // Insert a new Node
+{
+	If value already exist in the Set:
+		return false;
+	Else:
+		If Set is empty:
+			Create a new Node and let both head and tail be it.
+			Increment m_size by one.
+			return true.
+		If the value will be the least one in the Set, namely adding to the front:
+			Create a new Node p, and let its prevNode be nullptr, nextNode be head, and m_value be value.
+			Change the head's prevNode to p.
+			Change head to p.
+			Increment m_size by one.
+			return true.
+		If the value will be the largest one in the Set, namely adding to the rear:
+			Create a new Node p, and let its nextNode be nullptr, prevNode be tail, and m_value be value.
+			Change the tail's nextNode to p.
+			Change tail to p.
+			Increment m_size by one.
+			return true.
+		If the value will neither be the largest one or least one in the Set, namely adding in the middle position:
+			Create (not using new here) an object pos and let it be head.
+			Repeatedly:
+				If pos's nextNode's m_value is larger than value,
+					Create a new Node p,
+					Let p's prevNode be pos,
+					Let p's nextNode be pos's nextNode,
+					Let p's m_value be value,
+					Let p's prevNode's nextNode be p,
+					Let p's nextNode's prevNode be p.
+					Increment m_size by one.
+					return true.	
+				Let pos be pos's nextNode.
+
+}
+
+bool Set::erase(const ItemType &value) // Remove a Node
+{
+	If this Set does not contain value:
+		return false.
+	If there is only one element in the Set:
+		Create (not new) an object p and assign it to be head.
+		Let both head and tail be nullptr.
+		Delete p.
+		Decrement m_size by one.
+		return true.
+	If removing the head Node:
+		Create (not new) an object p and assign it to be head.
+		Let head's nextNode's prevNode be nullptr.
+		Let head be head's nextNode.
+		delete p.
+		Decrement m_size by one.
+		return true.
+	If removing the tail Node:
+		Create (not new) an object p and assign it to be tail.
+		Let tail's prevNode's nextNode be nullptr.
+		Let tail be tail's prevNode.
+		delete p.
+		Decrement m_size by one.
+		return true.
+	If removing a middle Node:
+		Create (not new) an object pos and assign it to be head.
+		Repeatedly:
+			If pos's m_value is value:
+				Let pos's prevNode's nextNode be pos's nextNode.
+				Let pos's nextNode's prevNode be pos's prevNode.
+				delete pos.
+				Decrement m_size by one.
+				return true.
+			Let pos = pos's nextNode.
+}
+
+
+bool Set::contains(const ItemType &value) const // Check if the linked list contains a value
+{
+	Let pos = head.
+	Repeatedly for m_size times:
+		If pos's m_value = value,
+			Return true.
+		Let pos = pos's Nextnode.
+	Return false.
+}
+
+bool Set::get(int pos, ItemType &value) const // Get the pos-th large value in the Set.
+{
+	If 0 <= pos < m_size:
+		Let p = head.
+		Repeat pos times:
+			Let p = p's nextNode.
+		Let value = p's m_value.
+		Return true.
+	Return false.
+		
+}
+
+void Set::swap(Set &other) // Swap two Sets.
+{
+	Create (not new) a Set temp and let temp's head, tail, m_value be identical as this's.
+	Let this's head, tail, m_value be identical as other's.
+	Let other's head, tail, m_value be identical as temp's.
+}
+
+void unite(const Set& s1, const Set& s2, Set& result) // Union of Set
+{
+	Let result = s1.
+	Repeatedly for each node p in s2:
+		Insert p's m_value to result.
+}
+
+
+void butNot(const Set& s1, const Set& s2, Set& result) // Set subtraction
+{
+	Let result = s1.
+	Repeatedly for each node p in s2:
+		If p's m_value is contained in Result:
+			Erase p's m_value in Result.
+}
+
+
+3. Test Cases:
+The tests were performed on a set of strings (i.e., ItemType was a type alias for std::string)
+
+#include "Set.h"
+#include <string>
+#include <iostream>
+#include <cassert>
+
+int main()
+{
+    
+    Set s1; // Test Set constructor
+    assert(s1.empty()); // Test empty
+    assert(s1.size() == 0); // Test size
+    s1.insert("f"); // Test insert
+    s1.insert("c");
+    s1.insert("a");
+    s1.insert("b");
+    s1.insert("d");
+    s1.insert("e");
+    ItemType tempValue = "";
+    for(int i = 0; i < s1.size(); i ++)
+    {
+        ItemType tempValue0;
+        s1.get(i, tempValue0); // Test get
+        assert(tempValue < tempValue0); // Test insert in an increasing order
+        tempValue = tempValue0;
+    }
+    assert(s1.size() == 6);
+    assert(s1.contains("e")); // Test contains
+    s1.insert("e"); // Test insert an existing value
+    assert(s1.size() == 6);
+    Set s2(s1); // Test Copy constructor
+    Set s3;
+    s3 = s1; // Test Assignment Operator
+    assert(s1.size() == s2.size() && s1.size() == s3.size()); // Test Copy constructor and Assignment Operator
+    for(int i = 0; i < s1.size(); i ++)
+    {
+        ItemType tempValue1;
+        ItemType tempValue2;
+        ItemType tempValue3;
+        s1.get(i, tempValue1);
+        s2.get(i, tempValue2);
+        s3.get(i, tempValue3);
+        assert(tempValue1 == tempValue2 && tempValue2 == tempValue3); // Test Copy constructor and Assignment Operator
+    }
+    assert(!s3.erase("j")); // Test erase a non-existing value
+    assert(s3.erase("c") && s3.size() == 5); // Test erase a existing value
+    ItemType arr[5];
+    arr[0] = "a";
+    arr[1] = "b";
+    arr[2] = "d";
+    arr[3] = "e";
+    arr[4] = "f";
+    for(int i = 0; i < 5; i ++)
+    {
+        ItemType tempValue6;
+        s3.get(i, tempValue6);
+        assert(arr[i] == tempValue6); // Test successfully erased the value
+    }
+    Set s4;
+    s4.insert("a");
+    s4.insert("b");
+    s4.insert("c");
+    s4.insert("x");
+    s4.insert("y");
+    Set result1;
+    unite(s1, s1, result1);
+    assert(result1.size() == 6); // Test unite the same Set
+    unite(s1, s4, result1);
+    assert(result1.size() == 8); // Test unite different Set
+    ItemType arr1[8];
+    arr1[0] = "a";
+    arr1[1] = "b";
+    arr1[2] = "c";
+    arr1[3] = "d";
+    arr1[4] = "e";
+    arr1[5] = "f";
+    arr1[6] = "x";
+    arr1[7] = "y";
+    for(int i = 0; i < 8; i ++)
+    {
+        ItemType tempValue4;
+        result1.get(i, tempValue4);
+        assert(arr1[i] == tempValue4); // Test unite different Set
+    }
+    Set result2;
+    butNot(s1, s1, result2);
+    assert(result2.size() == 0); // Test butNot the same Set
+    butNot(s1, s4, result2);
+    assert(result2.size() == 3);
+    ItemType arr2[3];
+    arr2[0] = "d";
+    arr2[1] = "e";
+    arr2[2] = "f";
+    for(int i = 0; i < 3; i ++)
+    {
+        ItemType tempValue5;
+        result2.get(i, tempValue5);
+        assert(arr2[i] == tempValue5); // Test unite different Set
+    }
+   
+    std::cerr << "Passed all tests" << std::endl;
+    
+    return 0;
+}

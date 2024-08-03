@@ -1,0 +1,99 @@
+1e:
+
+In test 1, iterator is not used, so push_back would not invalidate anything here. In test 2, push_back is used on a "list", which would not invalidate the iterator for a list. In test 3, push_back is used on a "vector", which would shuffle the memory around and invalidate iterator, so the iterator would point to a random spot in the memory.
+
+
+3:
+
+Because the comparison operator "=" is not implemented for the Coord class, so when the insert function try to use "=" to compare two Coord variables, an undefined behavior occurs, and thus a compilation error is caused.
+
+
+4b:
+
+Because we need to get access to the previous file path to put in front of the name of the current file.
+
+
+5a:
+O(N^3). Because there are three nested loop, so the highest degree would be 3, and we discard the coefficients and lower degrees, so the final result is O(N^3).
+
+
+5b:
+O(N^3). Because the consideration of symmetry would make the top two loop into (1 + 2 + ... + N) = 1/2 * N^2 + 1/2 * N times. So the highest degree is not changed but only the coefficients changed. Thus the complexity is still O(N^3).
+
+
+6a:
+O(N^2). Since we only consider the highest degree of complexity, we focus on the for loop. This for loop would have N times of iteration. Inside each iteration, the get function would take N/2 steps in the worst scenario, and then the insert function would take N/2 steps in the worst scenario, so approximately it would take N/2 + N/2 = N steps in each iteration. Therefore, in total the time complexity is approximately O(N*N) = O(N^2).
+
+
+6b:
+O(N log N). 
+
+void Set::unite(const Set& set1, const Set& set2)
+{
+    vector<ItemType> v;  -----------------------------------------------------> O(1)
+
+      // copy all items into v;
+    for (Node* p1 = set1.m_head->m_next; p1 != set1.m_head; p1 = p1->m_next) -> O(N)
+        v.push_back(p1->m_value);    -----------------------------------------> O(1)
+    for (Node* p2 = set2.m_head->m_next; p2 != set2.m_head; p2 = p2->m_next) -> O(N)
+        v.push_back(p2->m_value);    -----------------------------------------> O(1)
+
+      // sort v using an O(N log N) algorithm
+    sort(v.begin(), v.end());        -----------------------------------------> O(N log N)
+
+      // delete result nodes (other than the dummy node)
+    while (m_head->m_next != m_head). ----------------------------------------> O(N)
+        doErase(m_head->m_next); ---------------------------------------------> O(1)
+
+      // copy unique items from v into result
+    for (size_t k = 0; k < v.size(); k++). -----------------------------------> O(N)
+    {
+        if (k == 0  ||  v[k] != v[k-1])  // add non-duplicates ---------------> O(1)
+            insertBefore(m_head, v[k]); --------------------------------------> O(1)
+    }
+
+      // v is destroyed when function returns
+}
+
+In total, we have 1 + N*1 + N*1 + N log N + N*1 + N*(1+1) steps. After discarding the lower degrees and coefficients, we have O(N log N).
+
+
+6c:
+O(N).
+
+void Set::unite(const Set& set1, const Set& set2)
+{
+    const Set* sp = &set2;   -------------------------------------> O(1)
+    if (this == &set1)  ------------------------------------------> O(1)
+    {
+        if (this == &set2)  --------------------------------------> O(1)
+                return;   ----------------------------------------> O(1)
+    }
+    else if (this == &set2) --------------------------------------> O(1)
+        sp = &set1;   --------------------------------------------> O(1)
+    else          ------------------------------------------------> O(1)
+    {
+        *this = set1;        -------------------------------------> O(1)
+        if (&set1 == &set2)  -------------------------------------> O(1)
+            return;     ------------------------------------------> O(1)
+    }
+    Node* p1 = m_head->m_next;  ----------------------------------> O(1)
+    Node* p2 = sp->m_head->m_next; -------------------------------> O(1)
+    while (p1 != m_head  &&  p2 != sp->m_head) -------------------> O(N)
+    {
+        if (p1->m_value < p2->m_value)   -------------------------> O(1)
+            p1 = p1->m_next;  ------------------------------------> O(1)
+        else        ----------------------------------------------> O(1)
+        {
+            if (p1->m_value > p2->m_value)  ----------------------> O(1)
+                insertBefore(p1, p2->m_value); -------------------> O(1)
+            else  ------------------------------------------------> O(1)
+                p1 = p1->m_next; ---------------------------------> O(1)
+            p2 = p2->m_next;  ------------------------------------> O(1)
+        }
+    }
+    for ( ; p2 != sp->m_head; p2 = p2->m_next)  ------------------> O(N)
+        insertBefore(m_head, p2->m_value);   ---------------------> O(1)
+}
+
+After discarding the lower degrees and coefficients, we have O(N).

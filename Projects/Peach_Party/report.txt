@@ -1,0 +1,35 @@
+1.
+To begin with, since I stored my avatars in an Avatar* typed vector, I can check the 1st index and the 2nd index position for Peach and Yoshi. Then, in each time, since there are two types of situation: moveOnto (passing through the bank), and land (stopping on the top of the bank), I actually created these two member functions in Avatar class, they both have to make their x,y coordinate (in pixels) overlapped, and the difference is land would make the avatar in the waitingToRoll states, but moveOnto would make the avatar in the !waitingToRoll (not waitingToRoll) states. Thus we can determine which situation we are facing. In “land” situation, we also have to check if the avatars are in the “new” states, meaning they first landed here to avoid multiple interaction with bank. moveOnto doesn’t have to check. All the things left are determining how many money a bank has now/ need to be changed/ how many money an avatar has now/ need to be changed. Additionally, if the player lands here, we have to set the avatar’s “new” states to false.
+The function I used to check the co-location is getX() and getY().
+Specifically, they are:
+bool Avatar::land(int squareX, int squareY) const
+{
+    if(getX() == squareX && getY() == squareY && m_waiting_to_roll == true)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Avatar::moveOnto(int squareX, int squareY) const
+{
+    if(getX() == squareX && getY() == squareY && m_waiting_to_roll == false)
+    {
+        return true;
+    }
+    return false;
+}
+
+2.
+I have finished all the classes and they function like the demo.
+I tried to construct some general method/ common classes for Avatars and Enemies, since they both can move around. However, I tried so and I found out this would completely turn over my existing work, so I gave up.
+The random integer generator I used can only generate the same number at the same second. Therefore, all boos would move the same amount of distance. The sound when players encounters a boo is sometimes later than ideal situation, but most of time it works.
+3.
+I assume we can have some other assisting member functions.
+I assume I can have a member vector with type Avatar* to contain Peach and Yoshi.
+I assume we don’t have to construct two different classes for Yoshi and Peach, so I just used Avatar for both of them and a member data m_whichPlater to distinguish.
+I assume Bowser and Boo can return back when they at a fork.
+I assume Bowser can destroy any blue coins/red coins/ dropping squares.
+I assume we can have a Board type member data in studentWorld class.
+I assume we can put the int type member data m_bank (how much money the bank owns now) in studentWorld class. This would be convenient to change the text in title.
+I assume we can have getters for the member vectors for Actors and Avatars in studentWorld class.
